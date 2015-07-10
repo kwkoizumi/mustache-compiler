@@ -9,7 +9,7 @@
   "activationCommands": {
     "atom-workspace": "mustache-compiler:compile"
   },
-  "repository": "https://github.com/atom/mustache-compiler",
+  "repository": "https://github.com/kwkoizumi/mustache-compiler",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
