@@ -10,9 +10,6 @@ Milk = require 'milk'
 
 module.exports = MustacheCompiler =
   config:
-    defaultRootPath:
-      type: 'string'
-      default: '/'
     encoding:
       type: 'string'
       default: 'utf-8'
@@ -40,7 +37,16 @@ module.exports = MustacheCompiler =
     result = Milk.render(template, params)
 
     fs.writeFileSync resultFilePath, result, flag:'w+', encoding:atom.config.get('mustache-compiler.encoding')
-    atom.workspace.open resultFilePath, {activatePane: true}
+    atom.workspace.open(resultFilePath, {activatePane: true}).done((newEditor) ->
+      try
+        JSON.parse(newEditor.getText())
+        newEditor.setGrammar(atom.grammars.selectGrammar('json'))
+      catch error
+        newEditor.setGrammar(atom.grammars.selectGrammar('html'))
+    )
+
+    dirname = filename.replace(/\\/g, '/').replace(/\/[^\/]*$/, '')
+    localStorage.setItem('mustache-compiler.lastOpenPath', dirname)
 
   getText: ->
     editor = atom.workspace.getActivePaneItem()
@@ -48,8 +54,10 @@ module.exports = MustacheCompiler =
     return text
 
   getTemplatePath: ->
+    lastOpenPath = localStorage.getItem('mustache-compiler.lastOpenPath')
+    lastOpenPath ?= '/'
     options = {
-      defaultPath: atom.config.get('mustache-compiler.defaultRootPath'),
+      defaultPath: lastOpenPath,
       #filters: [
       #  { name: 'mustache', extensions: ['mustache'] },
       #  { name: 'Handlebars', extensions: ['hba'] },
