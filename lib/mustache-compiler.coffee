@@ -40,7 +40,13 @@ module.exports = MustacheCompiler =
     result = Milk.render(template, params)
 
     fs.writeFileSync resultFilePath, result, flag:'w+', encoding:atom.config.get('mustache-compiler.encoding')
-    atom.workspace.open resultFilePath, {activatePane: true}
+    atom.workspace.open(resultFilePath, {activatePane: true}).done((newEditor) ->
+      try
+        JSON.parse(newEditor.getText())
+        newEditor.setGrammar(atom.grammars.selectGrammar('json'))
+      catch error
+        newEditor.setGrammar(atom.grammars.selectGrammar('html'))
+    )
 
   getText: ->
     editor = atom.workspace.getActivePaneItem()
